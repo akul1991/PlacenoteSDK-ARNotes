@@ -38,3 +38,9 @@ screenshot.png
 # JSON local storage of simulator maps
 jsonMaps.json
 jsonMaps.json.meta
+
+# Xcode App Generation
+App/
+
+# Visual Studio
+.vs/
