@@ -41,7 +41,7 @@ public class NotesManager : MonoBehaviour {
 
     private GameObject mCurrNote;
     private NoteInfo mCurrNoteInfo;
-    
+
     // Use this for initialization
     void Start () {
 		
@@ -78,9 +78,10 @@ public class NotesManager : MonoBehaviour {
         return false;
     }
 
-    // Update checks for hit test, and if we're not editing a note.
+    // Update checks for hit test
     void Update ()
     {
+        // For hit testing on the device.
         if (Input.touchCount > 0)
         {
             var touch = Input.GetTouch(0);
@@ -98,18 +99,36 @@ public class NotesManager : MonoBehaviour {
                     if (Physics.Raycast(ray, out hit))
                     {
                         Debug.Log("Selected an existing note.");
-                        mCurrNote = hit.transform.gameObject;
 
-                        int index = mCurrNote.GetComponent<NoteID>().index;
-                        mCurrNoteInfo = mNotesInfoList[index];
+                        GameObject note = hit.transform.gameObject;
 
-                        // Show the Edit and Delete buttons
-                        mCurrNote.transform.Find("EditButton").gameObject.SetActive(true);
-                        mCurrNote.transform.Find("DeleteButton").gameObject.SetActive(true);
+                        // If the previous note was deleted, switch
+                        if (!mCurrNote)
+                        {
+                            mCurrNote = note;
+                            TurnOnButtons();
+                        }
+                        else if (note.GetComponent<NoteID>().mIndex != mCurrNote.GetComponent<NoteID>().mIndex)
+                        {
+                            // New note selected is not the current note. Disable the buttons of the current note.
+                            TurnOffButtons();
+
+                            mCurrNote = note;
+
+                            // Turn on buttons for the new selected note.
+                            TurnOnButtons();
+                        
+                        }
+                        else
+                        {
+                            // Selected note is already the current note, just toggle buttons.
+                            ToggleButtons();
+                        }
                     }
                     else
                     {
                         Debug.Log("Creating new note.");
+
                         // Add new note.
                         var screenPosition = Camera.main.ScreenToViewportPoint(touch.position);
                         ARPoint point = new ARPoint
@@ -120,7 +139,7 @@ public class NotesManager : MonoBehaviour {
 
                         ARHitTestResultType[] resultTypes =
                         {
-                        ARHitTestResultType.ARHitTestResultTypeFeaturePoint
+                            ARHitTestResultType.ARHitTestResultTypeFeaturePoint
                         };
 
                         foreach (ARHitTestResultType resultType in resultTypes)
@@ -137,10 +156,41 @@ public class NotesManager : MonoBehaviour {
         }
     }
 
+    private void ToggleButtons()
+    {
+        int index = mCurrNote.GetComponent<NoteID>().mIndex;
+        mCurrNoteInfo = mNotesInfoList[index];
+
+        // Toggle the edit and delete buttons
+        if (!mCurrNote.GetComponent<NoteID>().mActiveButtons)
+        {
+            TurnOnButtons();
+        }
+        else
+        {
+            TurnOffButtons();
+        }
+    }
+
+    private void TurnOnButtons()
+    {
+        mCurrNote.transform.Find("EditButton").gameObject.SetActive(true);
+        mCurrNote.transform.Find("DeleteButton").gameObject.SetActive(true);
+        mCurrNote.GetComponent<NoteID>().mActiveButtons = true;
+    }
+
+    private void TurnOffButtons()
+    {
+        mCurrNote.transform.Find("EditButton").gameObject.SetActive(false);
+        mCurrNote.transform.Find("DeleteButton").gameObject.SetActive(false);
+        mCurrNote.GetComponent<NoteID>().mActiveButtons = false;
+    }
+
 
     public void InstantiateNote(Vector3 notePosition)
     {
         Debug.Log("Creating new note");
+
         // Instantiate new note prefab and set transform.
         GameObject note = Instantiate(mNotePrefab);
         note.transform.position = notePosition;
@@ -154,7 +204,13 @@ public class NotesManager : MonoBehaviour {
         note.transform.Rotate(0f, -180f, 0f);
         note.SetActive(true);
 
-        // Set currently selected note
+        if (mCurrNote)
+        {
+            Debug.Log("Turning off buttons from previous note");
+            TurnOffButtons();
+        }
+
+        // Set new note as the current one.
         mCurrNote = note;
         
         mCurrNoteInfo = new NoteInfo
@@ -193,14 +249,13 @@ public class NotesManager : MonoBehaviour {
         input.DeactivateInputField();
         input.interactable = false;
 
-        mCurrNote.transform.Find("DeleteButton").gameObject.SetActive(false);
-        mCurrNote.transform.Find("EditButton").gameObject.SetActive(false);
+        TurnOffButtons();
 
-        int index = mCurrNote.GetComponent<NoteID>().index;
+        int index = mCurrNote.GetComponent<NoteID>().mIndex;
         if (index < 0)
         {
             // New note being saved!
-            mCurrNote.GetComponent<NoteID>().index = mNotesObjList.Count;
+            mCurrNote.GetComponent<NoteID>().mIndex = mNotesObjList.Count;
             Debug.Log("Saving note with ID " + mNotesObjList.Count);
             mNotesInfoList.Add(mCurrNoteInfo);
             mNotesObjList.Add(mCurrNote);
@@ -229,6 +284,8 @@ public class NotesManager : MonoBehaviour {
     public void OnEditButtonClick()
     {
         Debug.Log("Edit button clicked!");
+        // Set current note to the right edit button.
+        mCurrNoteInfo = mNotesInfoList[mCurrNote.GetComponent<NoteID>().mIndex];
         EditCurrNote();
     }
 
@@ -241,7 +298,7 @@ public class NotesManager : MonoBehaviour {
     private void DeleteCurrentNote()
     {
         Debug.Log("Deleting current note!");
-        int index = mCurrNote.GetComponent<NoteID>().index;
+        int index = mCurrNote.GetComponent<NoteID>().mIndex;
 
         if (index >= 0)
         {
@@ -252,7 +309,7 @@ public class NotesManager : MonoBehaviour {
             // Refresh Note indices
             for (int i = 0; i < mNotesObjList.Count; ++i)
             {
-                mNotesObjList[i].GetComponent<NoteID>().index = i;
+                mNotesObjList[i].GetComponent<NoteID>().mIndex = i;
             }
         }
 
@@ -302,7 +359,7 @@ public class NotesManager : MonoBehaviour {
             foreach (var noteInfo in notesList.notes)
             {
                 GameObject note = NoteFromInfo(noteInfo);
-                note.GetComponent<NoteID>().index = mNotesObjList.Count;
+                note.GetComponent<NoteID>().mIndex = mNotesObjList.Count;
 
                 mNotesObjList.Add(note);
                 mNotesInfoList.Add(noteInfo);

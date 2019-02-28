@@ -348,8 +348,11 @@ public class PlacenoteSampleView : MonoBehaviour, PlacenoteListener
         Debug.Log("prevStatus: " + prevStatus.ToString() + " currStatus: " + currStatus.ToString());
 
         if (currStatus == LibPlacenote.MappingStatus.RUNNING && prevStatus == LibPlacenote.MappingStatus.LOST) {
-            mLabelText.text = "Localized";
+            mLabelText.text = "Localized!";
             GetComponent<NotesManager>().LoadNotesJSON(mSelectedMapInfo.metadata.userdata);
+
+            // Disable pointcloud
+            FeaturesVisualizer.DisablePointcloud();
         } else if (currStatus == LibPlacenote.MappingStatus.RUNNING && prevStatus == LibPlacenote.MappingStatus.WAITING) {
             mLabelText.text = "Mapping: Tap to add Notes";
         } else if (currStatus == LibPlacenote.MappingStatus.WAITING) {

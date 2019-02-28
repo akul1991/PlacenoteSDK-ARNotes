@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class NoteID : MonoBehaviour
 {
-
     // This is set to -1 when instantiated, and assigned when saving notes.
-    public int index = -1;
+    [SerializeField] public int mIndex = -1;
+    [SerializeField] public bool mActiveButtons = false;
 
     // Use this for initialization
     void Start()
