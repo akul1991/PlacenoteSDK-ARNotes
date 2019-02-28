@@ -105,6 +105,11 @@ public class PlacenoteSampleView : MonoBehaviour, PlacenoteListener
 
         LibPlacenote.Instance.SearchMaps(locationInfo.latitude, locationInfo.longitude, radiusSearch, (mapList) =>
         {
+            foreach (Transform t in mListContentParent.transform)
+            {
+                Destroy(t.gameObject);
+            }
+
             // Render the map list!
             foreach (LibPlacenote.MapInfo mapId in mapList) {
                 if (mapId.metadata.userdata != null) {
