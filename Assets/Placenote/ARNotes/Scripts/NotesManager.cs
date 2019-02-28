@@ -41,9 +41,7 @@ public class NotesManager : MonoBehaviour {
 
     private GameObject mCurrNote;
     private NoteInfo mCurrNoteInfo;
-
-    [SerializeField] public bool mapping = false;
-     
+         
     // Use this for initialization
     void Start () {
 		
@@ -83,77 +81,73 @@ public class NotesManager : MonoBehaviour {
     // Update checks for hit test
     void Update ()
     {
-        // Ensure we are in mapping mode to add notes. This is set from PlacenoteSampleView.
-        if (mapping)
+        // For hit testing on the device.
+        if (Input.touchCount > 0)
         {
-            // For hit testing on the device.
-            if (Input.touchCount > 0)
+            var touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Ended)
             {
-                var touch = Input.GetTouch(0);
-
-                if (touch.phase == TouchPhase.Began)
+                if (EventSystem.current.currentSelectedGameObject == null)
                 {
-                    if (EventSystem.current.currentSelectedGameObject == null)
+                    Debug.Log("Not touching a UI button, moving on.");
+
+                    // Test if you are hitting an existing marker
+                    RaycastHit hit = new RaycastHit();
+                    Ray ray = Camera.main.ScreenPointToRay(touch.position);
+
+                    if (Physics.Raycast(ray, out hit))
                     {
-                        Debug.Log("Not touching a UI button, moving on.");
+                        Debug.Log("Selected an existing note.");
 
-                        // Test if you are hitting an existing marker
-                        RaycastHit hit = new RaycastHit();
-                        Ray ray = Camera.main.ScreenPointToRay(touch.position);
+                        GameObject note = hit.transform.gameObject;
 
-                        if (Physics.Raycast(ray, out hit))
+                        // If the previous note was deleted, switch
+                        if (!mCurrNote)
                         {
-                            Debug.Log("Selected an existing note.");
+                            mCurrNote = note;
+                            TurnOnButtons();
+                        }
+                        else if (note.GetComponent<NoteParams>().mIndex != mCurrNote.GetComponent<NoteParams>().mIndex)
+                        {
+                            // New note selected is not the current note. Disable the buttons of the current note.
+                            TurnOffButtons();
 
-                            GameObject note = hit.transform.gameObject;
+                            mCurrNote = note;
 
-                            // If the previous note was deleted, switch
-                            if (!mCurrNote)
-                            {
-                                mCurrNote = note;
-                                TurnOnButtons();
-                            }
-                            else if (note.GetComponent<NoteParams>().mIndex != mCurrNote.GetComponent<NoteParams>().mIndex)
-                            {
-                                // New note selected is not the current note. Disable the buttons of the current note.
-                                TurnOffButtons();
+                            // Turn on buttons for the new selected note.
+                            TurnOnButtons();
 
-                                mCurrNote = note;
-
-                                // Turn on buttons for the new selected note.
-                                TurnOnButtons();
-
-                            }
-                            else
-                            {
-                                // Selected note is already the current note, just toggle buttons.
-                                ToggleButtons();
-                            }
                         }
                         else
                         {
-                            Debug.Log("Creating new note.");
+                            // Selected note is already the current note, just toggle buttons.
+                            ToggleButtons();
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Creating new note.");
 
-                            // Add new note.
-                            var screenPosition = Camera.main.ScreenToViewportPoint(touch.position);
-                            ARPoint point = new ARPoint
-                            {
-                                x = screenPosition.x,
-                                y = screenPosition.y
-                            };
+                        // Add new note.
+                        var screenPosition = Camera.main.ScreenToViewportPoint(touch.position);
+                        ARPoint point = new ARPoint
+                        {
+                            x = screenPosition.x,
+                            y = screenPosition.y
+                        };
 
-                            ARHitTestResultType[] resultTypes =
-                            {
-                                ARHitTestResultType.ARHitTestResultTypeFeaturePoint
-                            };
+                        ARHitTestResultType[] resultTypes =
+                        {
+                            ARHitTestResultType.ARHitTestResultTypeFeaturePoint
+                        };
 
-                            foreach (ARHitTestResultType resultType in resultTypes)
+                        foreach (ARHitTestResultType resultType in resultTypes)
+                        {
+                            if (HitTestWithResultType(point, resultType))
                             {
-                                if (HitTestWithResultType(point, resultType))
-                                {
-                                    Debug.Log("Found a hit test result");
-                                    return;
-                                }
+                                Debug.Log("Found a hit test result");
+                                return;
                             }
                         }
                     }
@@ -195,8 +189,6 @@ public class NotesManager : MonoBehaviour {
 
     public void InstantiateNote(Vector3 notePosition)
     {
-        Debug.Log("Creating new note");
-
         // Instantiate new note prefab and set transform.
         GameObject note = Instantiate(mNotePrefab);
         note.transform.position = notePosition;
