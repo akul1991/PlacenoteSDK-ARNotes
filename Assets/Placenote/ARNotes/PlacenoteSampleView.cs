@@ -184,8 +184,9 @@ public class PlacenoteSampleView : MonoBehaviour, PlacenoteListener
                mInitPanel.SetActive(false);
                mExitButton.SetActive(true);
                mMappingPanel.SetActive(true);
+               mMappingPanel.transform.Find("SaveMapButton").gameObject.SetActive(false);
 
-               LibPlacenote.Instance.StartSession(true);
+               LibPlacenote.Instance.StartSession();
 
                if (mReportDebug) {
                    LibPlacenote.Instance.StartRecordDataset((datasetCompleted, datasetFaulted, datasetPercentage) =>
@@ -355,11 +356,13 @@ public class PlacenoteSampleView : MonoBehaviour, PlacenoteListener
         if (currStatus == LibPlacenote.MappingStatus.RUNNING && prevStatus == LibPlacenote.MappingStatus.LOST) {
             mLabelText.text = "Localized!";
             GetComponent<NotesManager>().LoadNotesJSON(mSelectedMapInfo.metadata.userdata);
+            GetComponent<NotesManager>().mapping = false;
 
             // Disable pointcloud
             FeaturesVisualizer.DisablePointcloud();
         } else if (currStatus == LibPlacenote.MappingStatus.RUNNING && prevStatus == LibPlacenote.MappingStatus.WAITING) {
             mLabelText.text = "Mapping: Tap to add Notes";
+            GetComponent<NotesManager>().mapping = true;
         } else if (currStatus == LibPlacenote.MappingStatus.WAITING) {
             if (GetComponent<NotesManager>().mNotesObjList.Count != 0) {
                 GetComponent<NotesManager>().ClearNotes();
