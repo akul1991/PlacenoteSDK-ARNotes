@@ -23,9 +23,25 @@ To install ARNotes, follow these instructions.
 
 ## Using the app
 1. Select _New Map_, and start moving your phone to map the area.
+
+    ![Start mapping](https://i.imgur.com/yQTc7pF.gif)
+
 2. Tap the screen to add notes!
+
+    ![Add notes](https://i.imgur.com/KB8yrt8.gif)
+
 3. To edit a note, tap the note and select the green edit icon.
+
+    ![Edit note](https://i.imgur.com/Pi2WxN9.gif)
+
 4. To delete a note, tap the note and select the red delete icon.
+    
+    ![Delete note](https://i.imgur.com/vvI5Pfs.gif)
+
 5. Once you are happy with the scene, select _Save Map_. Keep note of the name your map was saved with!
-6. To view the notes, select _Load Map_, and find the map name. Make sure you are near the same area in order for the app to relocalize!
-7. Voila! Your notes should show up, exactly where you left them.
+
+    ![Save map](https://i.imgur.com/WtbLEM4.gif)
+
+6. To view the notes, select _Load Map_, and find the map name. Make sure you are near the same area in order for the app to relocalize! Your notes should show up exactly where you left them.
+
+   ![Load map](https://i.imgur.com/qBgy2Q3.gif)
