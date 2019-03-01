@@ -9,14 +9,13 @@ Placenote is an easy and convenient method to add mapping and precise persistent
 To install ARNotes, follow these instructions.
 
 1. Ensure Git LFS (large file storage) is installed on your Mac. Several critical library files are stored using this mechanism.
-  - Install Git LFS either using HomeBrew: `brew install git-lfs`
-  - Or MacPorts: `port install git-lfs`
-  - To install, run: `git lfs install`
+    - Install Git LFS either using HomeBrew: `brew install git-lfs`
+    - Or MacPorts: `port install git-lfs`
+    - To install, run: `git lfs install`
 2. Clone this repository.
-  - SSH: `git clone git@github.com:Placenote/PlacenoteSDK-ARNotes.git`
-  - HTTPS: `git clone https://github.com/Placenote/PlacenoteSDK-ARNotes.git`
-3. Download files stored with Git LFS
-  - `git lfs pull`
+    - SSH: `git clone git@github.com:Placenote/PlacenoteSDK-ARNotes.git`
+    - HTTPS: `git clone https://github.com/Placenote/PlacenoteSDK-ARNotes.git`
+3. Download files stored with Git LFS: `git lfs pull`
 4. Open the project as a new project in Unity (Recommended: Unity 2018.3.6)
 5. Make sure you have your Placenote API key. [Get your API key here!](https://developer.placenote.com)
 6. Load the ARNotes scene from the project window (`Placenote/ARNotes/ARNotes`) and add your API key under `PlacenoteCameraManager`.
